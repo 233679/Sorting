@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Sorting
@@ -7,74 +8,104 @@ namespace Sorting
     {
 
         static Boolean optimised = false;
-        
+
         static void Main(string[] args)
         {
             selectSort(args);
         }
-        
+
         static void selectSort(string[] args)
         {
 
 
-            int[] testSizes = new int[]{10, 100, 1000, 2000, 5000, 10000}
-            List<string> totalTimes = new List;
-             
-            string[] time = new string[4]
-            
-            for (int iteration = 0; iteration < testSizes.length; iteration++)
+            int[] testSizes = new int[] { 10, 100, 1000, 2000, 5000, 10000 };
+            //int[] testSizes = new int[] { 10, 100, 1000, 2000};
+
+            // Populates the 2 dimentional array with diferent arrays.
+            string[][] times = new string[5][];
+            times[0] = new string[testSizes.Length];
+            times[1] = new string[testSizes.Length];
+            times[2] = new string[testSizes.Length];
+            times[3] = new string[testSizes.Length];
+            times[4] = new string[testSizes.Length];
+
+            // iterates over the given array lengths to sort.
+            for (int iteration = 0; iteration < testSizes.Length; iteration++)
             {
-            string[] names = PopulateArray();
-            string[] temp = new string[names.Length];
-            Array.Copy(names, temp, names.Length);
-            var watch = new System.Diagnostics.Stopwatch();//storing elapsed time using the built in diagnostics
+                // Creates an array to sort
+                string[] names = PopulateArray(testSizes[iteration]);
+                string[] temp = new string[names.Length];
+                Array.Copy(names, temp, names.Length);
+                var watch = new System.Diagnostics.Stopwatch();//storing elapsed time using the built in diagnostics
 
-        
-            watch.Start();   
-            insertionSort(temp);  
-            watch.Stop();//stop timer
-            time[0] = watch.ElapsedMilliseconds;
-            watch.Reset();
-            Array.Copy(names,temp,names.Length);//reload unsorted data
 
-            
-            watch.Start();
-            bubbleSort(temp);  
-            watch.Stop();//stop timer
-            time[1] = watch.ElapsedMilliseconds;
-            watch.Reset();              
-            Array.Copy(names, temp, names.Length);//reload unsorted data
+                // Sorts with insertion.
+                watch.Start();
+                insertionSort(temp);
+                watch.Stop();//stop timer
+                times[0][iteration] = watch.ElapsedMilliseconds.ToString();
+                watch.Reset();
+                Array.Copy(names, temp, names.Length);//reload unsorted data
 
-            
-            watch.Start();
-            MergeSort(temp, 0, temp.Length - 1);
-            watch.Stop();
-            time[2] = watch.ElapsedMilliseconds;
-            watch.Reset();              
-            Array.Copy(names, temp, names.Length);
 
-                            
-            optimised = true;
-            watch.Start();
-            bubbleSort(temp);
-            watch.Stop();//stop timer
-            time[3] = watch.ElapsedMilliseconds;
-            watch.Reset();     
-            Array.Copy(names, temp, names.Length);//reload unsorted data
+                // Sorts with bubble.
+                watch.Start();
+                bubbleSort(temp);
+                watch.Stop();//stop timer
+                times[1][iteration] = watch.ElapsedMilliseconds.ToString();
+                watch.Reset();
+                Array.Copy(names, temp, names.Length);//reload unsorted data
 
-                            
-            watch.Start();
-            quickSort(temp,0,temp.Length-1);
-            watch.Stop();
-            time[4] = watch.ElapsedMilliseconds;
-            watch.Reset();       
-            Array.Copy(names, temp, names.Length);//reload unsorted data
+
+                // Sorts with merge.
+                watch.Start();
+                MergeSort(temp, 0, temp.Length - 1);
+                watch.Stop();
+                times[2][iteration] = watch.ElapsedMilliseconds.ToString();
+                watch.Reset();
+                Array.Copy(names, temp, names.Length);
+
+
+                // Sorts with optimised bubble.
+                optimised = true;
+                watch.Start();
+                bubbleSort(temp);
+                watch.Stop();//stop timer
+                times[3][iteration] = watch.ElapsedMilliseconds.ToString();
+                watch.Reset();
+                Array.Copy(names, temp, names.Length);//reload unsorted data
+
+
+                // Sorts with optimised quick sort.
+                watch.Start();
+                quickSort(temp, 0, temp.Length - 1);
+                watch.Stop();
+                times[4][iteration] = watch.ElapsedMilliseconds.ToString();
+                watch.Reset();
+                Array.Copy(names, temp, names.Length);//reload unsorted data
 
             }
 
-            totalTimes.add(time);
-            Console.WriteLine(totalTimes)
+            // Prints the results to the console.
+            for (int i = 0; i < 5; i++) {
+
+                if (i == 0) {Console.Write("Insertions: ");}
+                else if (i == 1) {Console.Write("Bubble sort: ");}
+                else if (i == 2) {Console.Write("Merge sort: ");}
+                else if (i == 3) {Console.Write("Bubble sort (Optimised): ");}
+                else if (i == 4) {Console.Write("Quick sort: ");}
+
+                foreach (string time in times[i])
+                {
+                    Console.Write(time);
+                    Console.Write("ms ");
+                }
+
+                Console.WriteLine();
+            }
+
         }
+
 
 
         static int menu()
@@ -101,31 +132,17 @@ namespace Sorting
             return choice;
         }
 
-        
-        static string[] PopulateArray()
-        {
-            int qty = 0;
-            //Console.WriteLine("The program will generate an array of random names. You can then choose different sorting algoritms to apply ");
-            //Console.WriteLine("Very large numbers (greater than 50,000) may take a long time to sort");
-            //Console.WriteLine("How many names do you want (minimum 10, maximum 100,000)?");
-            //Console.WriteLine("If you choose a value outside this you will get 10 names");
-            
-            try { qty = Int32.Parse(Console.ReadLine()); }
-            catch { //Console.WriteLine("OK, you get 10 names \n"); }
 
-            if (qty < 10 || qty > 100000)
-            {
-                //Console.WriteLine("OK, you get 10 names \n");
-                qty = 10; 
-            }
-                
+        static string[] PopulateArray(int qty)
+        {
+
             string[] names = new string[qty];
             Random randFirst = new Random();
             Random randLast = new Random();
-                
+
             var firstLines = File.ReadAllLines("../../../Resources/firstNames.txt");
             var lastLines = File.ReadAllLines("../../../Resources/surNames.txt");
-            
+
             for (int i = 0; i < qty; i++)
             {
                 names[i] = firstLines[randFirst.Next(0, firstLines.Length)] + " " + lastLines[randLast.Next(0, lastLines.Length)];
@@ -133,7 +150,8 @@ namespace Sorting
 
             return names;
         }
-        
+
+
         static void print_array(string[] arr)
         {
             for (int i = 0; i < arr.Length; i++)
@@ -141,7 +159,7 @@ namespace Sorting
                 Console.WriteLine(i.ToString() + ". " + arr[i]);
             }
         }
-        
+
         static Boolean compareStrings(string str1, string str2) //returns true if str1 < str2
         {
             int comp = string.Compare(str1, str2);
@@ -151,11 +169,11 @@ namespace Sorting
             { return false; }
         }
 
-            
+
         //QUICK SORT ...O(log n)
         static void quickSort(string[] arr, int low, int high)
         {
-            if(low<high)
+            if (low < high)
             {
 
                 // pi is partitioning index, arr[p]
@@ -183,7 +201,7 @@ namespace Sorting
 
                 // If current element is smaller
                 // than the pivot
-                if (compareStrings(arr[j] , pivot))
+                if (compareStrings(arr[j], pivot))
                 {
 
                     // Increment index of
@@ -202,7 +220,7 @@ namespace Sorting
             arr[j] = temp;
         }
 
-            
+
         // BUBBLE SORT...O(n^2) because of the nested loops
         static void bubbleSort(string[] arr)
         {
@@ -225,14 +243,15 @@ namespace Sorting
                     }
 
                 }
-                if(!swapped && optimised) //check to see if the optimised version is being used
-                    
+                if (!swapped && optimised) //check to see if the optimised version is being used
+
                 {
                     optimised = false; //reset the boolean
                     return; //we're done - return
                 }
             }
         }
+
         //INSERTION SORT...O(n^2) because of the nested loops
         static void insertionSort(string[] arr)
         {
@@ -259,9 +278,9 @@ namespace Sorting
             }
         }
 
-            
+
         //MERGE SORT .....O(nlog n)
-       static public string[] MergeSort(string[] array, int left, int right)//Merge sort recursive routine- needs MergeArray to rebuild.
+        static public string[] MergeSort(string[] array, int left, int right)//Merge sort recursive routine- needs MergeArray to rebuild.
         {
             if (left < right)
             {
@@ -275,7 +294,7 @@ namespace Sorting
 
             return array;
         }
-       static public void MergeArray(string[] array, int left, int middle, int right)
+        static public void MergeArray(string[] array, int left, int middle, int right)
         {
             var leftArrayLength = middle - left + 1;
             var rightArrayLength = right - middle;
