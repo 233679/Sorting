@@ -89,7 +89,7 @@ namespace Sorting
             // Prints the results to the console.
             for (int i = 0; i < 5; i++) {
 
-                if (i == 0) {Console.Write("Insertions: ");}
+                if (i == 0) {Console.Write("Insertion sort: ");}
                 else if (i == 1) {Console.Write("Bubble sort: ");}
                 else if (i == 2) {Console.Write("Merge sort: ");}
                 else if (i == 3) {Console.Write("Bubble sort (Optimised): ");}
